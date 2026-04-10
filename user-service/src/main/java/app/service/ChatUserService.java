@@ -2,12 +2,10 @@ package app.service;
 
 import app.config.props.MinioProperties;
 import dto.request.ChatUserUpdateDTO;
-import dto.response.ChatUserDTO;
 import dto.response.PictureDTO;
 import app.entity.ChatUser;
 import app.mapper.ChatUserMapper;
 import app.repository.ChatUserRepository;
-import app.util.TextNormalize;
 import io.minio.GetObjectArgs;
 import io.minio.MinioClient;
 import io.minio.PutObjectArgs;
@@ -16,8 +14,6 @@ import io.minio.StatObjectResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
@@ -42,12 +38,6 @@ public class ChatUserService {
     public void updateUserWithUsername(@Valid ChatUserUpdateDTO chatUserUpdateDTO, String username) {
         chatUserRepository.findByUsername(username)
                 .ifPresent(chatUser -> chatUserMapper.updateFromDto(chatUserUpdateDTO, chatUser));
-    }
-
-    public Page<ChatUserDTO> getUsersNotUsername(String query, String username, Pageable pageable) {
-        String queryNormalized = TextNormalize.normalize(query);
-        return chatUserRepository.findByNameNormNotUsername(queryNormalized, username, pageable)
-                .map(chatUserMapper::toChatUserDTO);
     }
 
     // todo determine if sneakythrows is the right way of handling exceptions here

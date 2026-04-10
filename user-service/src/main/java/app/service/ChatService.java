@@ -27,7 +27,7 @@ import app.entity.Message;
 import app.repository.ActiveMembershipRepository;
 import app.repository.InvitationRepository;
 import app.repository.MessageRepository;
-import app.util.TextNormalize;
+import utils.TextNormalize;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;

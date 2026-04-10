@@ -1,5 +1,6 @@
 package app.service;
 
+import dto.event.UserCreatedEvent;
 import dto.response.AuthResponseDTO;
 import app.entity.RefreshToken;
 import app.config.props.JwtProperties;
@@ -7,7 +8,6 @@ import dto.request.LoginDTO;
 import dto.request.RefreshRequestDTO;
 import dto.request.SignUpDTO;
 import app.entity.ChatUser;
-import app.event.UserCreatedEvent;
 import app.exception.UsernameAlreadyExistsException;
 import app.mapper.AuthMapper;
 import app.mapper.ChatUserMapper;
@@ -15,7 +15,6 @@ import app.repository.ChatUserRepository;
 import app.repository.RefreshTokenRepository;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -45,12 +44,12 @@ public class AuthService {
     private final JwtEncoder jwtEncoder;
     private final ChatUserRepository chatUserRepository;
     private final PasswordEncoder passwordEncoder;
-    private final ApplicationEventPublisher eventPublisher;
     private final ChatUserMapper chatUserMapper;
     private final AuthMapper authMapper;
     private final MacAlgorithm macAlgorithm;
     private final JwtProperties jwtProperties;
     private final RefreshTokenRepository refreshTokenRepository;
+    private final KafkaPublisher kafkaPublisher;
 
     public AuthResponseDTO login(@Valid LoginDTO loginDTO) {
         UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = authMapper.toUsernamePasswordAuthenticationToken(loginDTO);
@@ -78,7 +77,7 @@ public class AuthService {
         ChatUser saved = chatUserRepository.save(user);
 
         UserCreatedEvent userCreatedEvent = chatUserMapper.toUserCreatedEvent(saved);
-        eventPublisher.publishEvent(userCreatedEvent);
+        kafkaPublisher.publishUserCreatedEvent(userCreatedEvent);
 
         String accessToken = generateAccessToken(saved);
 

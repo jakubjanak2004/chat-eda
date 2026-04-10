@@ -1,7 +1,7 @@
 package app.entity;
 
 import config.props.ValidationConstraints;
-import app.util.TextNormalize;
+import utils.TextNormalize;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

@@ -1,4 +1,4 @@
-package app.util;
+package utils;
 
 import java.text.Normalizer;
 

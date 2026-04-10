@@ -1,8 +1,8 @@
 package app.mapper;
 
+import dto.event.UserCreatedEvent;
 import dto.request.ChatUserUpdateDTO;
 import dto.response.ChatUserDTO;
-import app.event.UserCreatedEvent;
 import dto.request.SignUpDTO;
 import app.entity.ChatMembership;
 import app.entity.ChatUser;
@@ -41,5 +41,6 @@ public interface ChatUserMapper {
     @Mapping(source = "chatUser", target = ".")
     ChatUserDTO fromMembership(ChatMembership membership);
 
+    @Mapping(source = "chatUser", target = "chatUserDTO")
     UserCreatedEvent toUserCreatedEvent(ChatUser chatUser);
 }
