@@ -20,7 +20,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 @Component
 @RequiredArgsConstructor
-// TODO: do not use repository.save() when list of objects is created, use saveAll() always
+// TODO: when saving emit the created objects to kafka
 public class Generator {
     private static final Faker faker = new Faker(Locale.forLanguageTag("sk"));
     private static final Logger LOGGER = LoggerFactory.getLogger(Generator.class);

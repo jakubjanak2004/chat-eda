@@ -1,8 +1,8 @@
 package app.mapper;
 
+import dto.event.MessageCreatedEvent;
 import dto.response.MessageDTO;
 import app.entity.Chat;
-import app.event.MessageCreatedEvent;
 import dto.request.CreateMessageDTO;
 import app.entity.ChatUser;
 import app.entity.Message;
@@ -29,7 +29,6 @@ public interface MessageMapper {
     @Mapping(target = "responses", ignore = true)
     Message toEntity(CreateMessageDTO createMessageDTO, Chat chat, ChatUser chatUser, Instant created);
 
-    @Mapping(source="id", target="messageId")
-    @Mapping(source = "chat.id", target="chatId")
-    MessageCreatedEvent toMessageCreatedEvent(Message saved);
+    @Mapping(source="message", target = "messageDTO")
+    MessageCreatedEvent toMessageCreatedEvent(Message message);
 }

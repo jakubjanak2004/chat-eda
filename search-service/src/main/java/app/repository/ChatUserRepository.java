@@ -21,5 +21,5 @@ public interface ChatUserRepository extends ElasticsearchRepository<ChatUser, St
               }
             }
             """)
-    Page<ChatUser> findByNameNormWildcardNotUsername(String nameNormalizedPattern, String excludeUsername, Pageable pageable);
+    Page<ChatUser> findAllByNameNormWildcardNotUsername(String nameNormalizedPattern, String excludeUsername, Pageable pageable);
 }

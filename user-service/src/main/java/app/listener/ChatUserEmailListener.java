@@ -1,7 +1,7 @@
 package app.listener;
 
-import app.event.UserCreatedEvent;
 import app.service.ChatUserMailService;
+import dto.event.UserCreatedEvent;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;

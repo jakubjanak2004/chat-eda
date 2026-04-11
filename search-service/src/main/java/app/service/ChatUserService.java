@@ -2,6 +2,7 @@ package app.service;
 
 import app.mapper.ChatUserMapper;
 import app.repository.ChatUserRepository;
+import app.utils.Elasticsearch;
 import dto.response.ChatUserDTO;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -23,8 +24,8 @@ public class ChatUserService {
             return chatUserRepository.findByUsernameNot(username, pageable).map(chatUserMapper::toChatUserDTO);
         }
         String normalizedQuery = TextNormalize.normalize(query);
-        String pattern = String.format("*%s*", normalizedQuery);
-        return chatUserRepository.findByNameNormWildcardNotUsername(pattern, username, pageable)
+        String pattern = Elasticsearch.toContentWildcardPattern(normalizedQuery);
+        return chatUserRepository.findAllByNameNormWildcardNotUsername(pattern, username, pageable)
                 .map(chatUserMapper::toChatUserDTO);
     }
 

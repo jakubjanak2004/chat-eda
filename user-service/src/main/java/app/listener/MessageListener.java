@@ -1,7 +1,7 @@
 package app.listener;
 
-import app.event.MessageCreatedEvent;
 import app.service.ws.ChatWsService;
+import dto.event.MessageCreatedEvent;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionPhase;

@@ -1,9 +1,9 @@
 package app.service.ws;
 
+import dto.event.MessageCreatedEvent;
 import dto.response.MessageDTO;
 import app.entity.ChatMembership;
 import app.entity.Message;
-import app.event.MessageCreatedEvent;
 import app.mapper.MessageMapper;
 import app.repository.MessageRepository;
 import jakarta.validation.Valid;
@@ -25,11 +25,11 @@ public class ChatWsService {
     private final UserSessionRegistry userSessionRegistry;
 
     public void messageCreated(@Valid MessageCreatedEvent e) {
-        Message message = messageRepository.findById(e.messageId()).orElseThrow();
+        Message message = messageRepository.findById(e.messageDTO().id()).orElseThrow();
         MessageDTO messageDTO = messageMapper.toDTO(message);
 
         LOGGER.info("WS publish messageId={}, chatId={}, memberships={}",
-                e.messageId(), e.chatId(), message.getChat().getChatMemberships().size());
+                messageDTO.id(), messageDTO.chatId(), message.getChat().getChatMemberships().size());
 
         message.getChat().getChatMemberships().stream()
                 .map(ChatMembership::getChatUser)

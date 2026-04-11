@@ -1,6 +1,25 @@
 package app.service;
 
+import app.entity.ActiveMembership;
+import app.entity.Chat;
+import app.entity.ChatMembership;
+import app.entity.ChatUser;
+import app.entity.Invitation;
+import app.entity.Message;
+import app.mapper.ActiveMembershipMapper;
+import app.mapper.ChatMapper;
+import app.mapper.InvitationMapper;
+import app.mapper.MessageMapper;
+import app.repository.ActiveMembershipRepository;
+import app.repository.ChatMembershipRepository;
+import app.repository.ChatRepository;
+import app.repository.ChatUserRepository;
+import app.repository.InvitationRepository;
+import app.repository.MessageRepository;
+import dto.event.ChatCreatedEvent;
+import dto.event.MessageCreatedEvent;
 import dto.request.ActiveMembershipUpdateDTO;
+import dto.request.CreateChatDTO;
 import dto.request.CreateMessageDTO;
 import dto.request.GiveUpAdminDTO;
 import dto.response.ActiveMembershipDTO;
@@ -8,29 +27,9 @@ import dto.response.ChatDTO;
 import dto.response.InvitationDTO;
 import dto.response.MessageDTO;
 import dto.response.UserInvitationsDTO;
-import app.entity.ActiveMembership;
-import app.entity.Chat;
-import app.entity.ChatMembership;
-import app.entity.ChatUser;
-import app.entity.Invitation;
 import enumeration.MembershipType;
-import app.event.MessageCreatedEvent;
-import app.mapper.ActiveMembershipMapper;
-import app.mapper.ChatMapper;
-import app.mapper.InvitationMapper;
-import app.mapper.MessageMapper;
-import app.repository.ChatMembershipRepository;
-import app.repository.ChatRepository;
-import app.repository.ChatUserRepository;
-import dto.request.CreateChatDTO;
-import app.entity.Message;
-import app.repository.ActiveMembershipRepository;
-import app.repository.InvitationRepository;
-import app.repository.MessageRepository;
-import utils.TextNormalize;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -38,6 +37,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import utils.TextNormalize;
 
 import java.time.Instant;
 import java.util.List;
@@ -54,12 +54,12 @@ public class ChatService {
     private final ChatRepository chatRepository;
     private final MessageRepository messageRepository;
     private final ChatUserRepository chatUserRepository;
-    private final ApplicationEventPublisher eventPublisher;
     private final ActiveMembershipRepository activeMembershipRepository;
     private final ActiveMembershipMapper activeMembershipMapper;
     private final ChatMembershipRepository chatMembershipRepository;
     private final InvitationRepository invitationRepository;
     private final InvitationMapper invitationMapper;
+    private final KafkaPublisher kafkaPublisher;
 
     @PreAuthorize("@chatUserSecurity.hasUsername(#username, authentication)")
     public Page<ChatDTO> getChatsForUsername(String query, String username, Pageable pageable) {
@@ -90,7 +90,7 @@ public class ChatService {
 
         Message saved = messageRepository.save(message);
         MessageCreatedEvent messageCreatedEvent = messageMapper.toMessageCreatedEvent(saved);
-        eventPublisher.publishEvent(messageCreatedEvent);
+        kafkaPublisher.publishMessageCreatedEvent(messageCreatedEvent);
 
         return messageMapper.toDTO(saved);
     }
@@ -129,6 +129,10 @@ public class ChatService {
         Chat chat = Chat.createChatWithOwnerAndMembers(dto.name(), owner, members);
 
         Chat saved = chatRepository.save(chat);
+
+        ChatCreatedEvent chatCreatedEvent = chatMapper.toChatCreatedEvent(saved);
+        kafkaPublisher.publishChatCreatedEvent(chatCreatedEvent);
+
         return chatMapper.toDTO(saved, null);
     }
 
