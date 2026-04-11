@@ -1,9 +1,16 @@
 package app.utils;
 
-import utils.ElasticsearchWildcard;
-
 public class Elasticsearch {
     public static String toContentWildcardPattern(String trimmedQuery) {
-        return "*" + ElasticsearchWildcard.escape(trimmedQuery) + "*";
+        return "*" + escape(trimmedQuery) + "*";
+    }
+
+    public static String escape(String s) {
+        if (s == null || s.isEmpty()) {
+            return "";
+        }
+        return s.replace("\\", "\\\\")
+                .replace("*", "\\*")
+                .replace("?", "\\?");
     }
 }

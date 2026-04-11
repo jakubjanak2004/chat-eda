@@ -1,10 +1,9 @@
 package app.config;
 
-import config.props.JwtProperties;
-import config.props.SecurityProperties;
-import app.exception.UsernameNotFoundException;
 import app.repository.ChatUserRepository;
 import com.nimbusds.jose.jwk.source.ImmutableSecret;
+import config.props.JwtProperties;
+import config.props.SecurityProperties;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,6 +16,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
@@ -115,8 +115,8 @@ public class SecurityConfig {
     }
 
     @Bean
-    public UserDetailsService userDetailsService(ChatUserRepository calendarUserRepository) {
-        return username -> calendarUserRepository.findByUsername(username)
+    public UserDetailsService userDetailsService(ChatUserRepository chatUserRepository) {
+        return username -> chatUserRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
 

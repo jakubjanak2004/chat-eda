@@ -6,8 +6,8 @@ import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 import org.springframework.scheduling.annotation.EnableAsync;
 
 @EnableAsync
-@ConfigurationPropertiesScan
 @SpringBootApplication
+@ConfigurationPropertiesScan({"config.props", "app.config.props"})
 public class UserServiceApplication {
 
 	public static void main(String[] args) {

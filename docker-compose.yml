@@ -1,13 +1,22 @@
 services:
+  # Single HTTP entrypoint for apps: user-service and search-service are not published on the host.
+  # Gateway: prefixed /user/..., /search/...; legacy GET /users, GET /chats/me, GET /chats/{uuid}/messages -> search-service; else user-service (see gateway/nginx.conf).
+  gateway:
+    image: nginx:1.27-alpine
+    container_name: chat-eda-gateway
+    ports:
+      - "8080:80"
+    volumes:
+      - ./gateway/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - user-service
+      - search-service
+
   user-service:
     build:
       context: .
       dockerfile: user-service/Dockerfile
     container_name: user-service
-    ports:
-      # App listens on 8080 by default (server.port); map host 8090 -> container 8080
-      - "8090:8080"
-      - "9091:9091"
     env_file:
       - .env
     environment:
@@ -32,10 +41,6 @@ services:
       context: .
       dockerfile: search-service/Dockerfile
     container_name: search-service
-    ports:
-      # App HTTP defaults to 8080 unless server.port is set
-      - "8091:8080"
-      - "9093:9093"
     env_file:
       - .env
     environment:

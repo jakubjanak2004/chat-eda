@@ -3,7 +3,7 @@ package app.service;
 import dto.event.UserCreatedEvent;
 import dto.response.AuthResponseDTO;
 import app.entity.RefreshToken;
-import app.config.props.JwtProperties;
+import config.props.JwtProperties;
 import dto.request.LoginDTO;
 import dto.request.RefreshRequestDTO;
 import dto.request.SignUpDTO;

@@ -25,10 +25,16 @@ public interface ChatMapper {
 
     @BeanMapping(ignoreUnmappedSourceProperties = "lastMessage")
     @Mapping(target = "nameNormalized", source = "name", qualifiedByName = "normalizeChatName")
+    @Mapping(target = "usernamesList", source = "chatUsers", qualifiedByName = "chatUsernames")
     Chat toEntity(ChatDTO chatDTO);
 
     @Named("normalizeChatName")
     default String normalizeChatName(String name) {
         return TextNormalize.normalize(name);
+    }
+
+    @Named("chatUsernames")
+    default List<String> chatUsernames(List<ChatUserDTO> chatUsers) {
+        return chatUsers.stream().map(ChatUserDTO::username).toList();
     }
 }

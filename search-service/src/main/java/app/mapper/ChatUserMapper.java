@@ -15,6 +15,7 @@ public interface ChatUserMapper {
     ChatUserDTO toChatUserDTO(ChatUser user);
 
     @Mapping(target = "nameNormalized", expression = "java(normalizeFullName(chatUserDTO))")
+    @Mapping(target = "authorities", ignore = true)
     ChatUser toEntity(ChatUserDTO chatUserDTO);
 
     default String normalizeFullName(ChatUserDTO chatUserDTO) {
