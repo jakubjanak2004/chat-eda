@@ -15,6 +15,7 @@ import org.mapstruct.ReportingPolicy;
 public interface MessageMapper {
     @Mapping(source = "responseToSenderUsername", target = "responseToSender", qualifiedByName = "usernameOnly")
     @Mapping(source = "senderUsername", target = "sender", qualifiedByName = "usernameOnly")
+    @Mapping(target = "usernamesList", ignore = true)
     MessageDTO toDTO(Message message);
 
     @Named("usernameOnly")

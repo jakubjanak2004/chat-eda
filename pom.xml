@@ -9,9 +9,10 @@
     <packaging>pom</packaging>
 
     <modules>
+        <module>shared</module>
         <module>search-service</module>
         <module>user-service</module>
-        <module>shared</module>
+        <module>ws-service</module>
     </modules>
 
     <properties>

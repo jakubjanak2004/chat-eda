@@ -1,8 +1,8 @@
-package app.config.ws;
+package app.config;
 
-import app.service.ws.UserSessionRegistry;
+import app.service.UserSessionRegistry;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
-import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.messaging.Message;

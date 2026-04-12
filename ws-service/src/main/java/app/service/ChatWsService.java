@@ -1,11 +1,7 @@
-package app.service.ws;
+package app.service;
 
 import dto.event.MessageCreatedEvent;
 import dto.response.MessageDTO;
-import app.entity.ChatMembership;
-import app.entity.Message;
-import app.mapper.MessageMapper;
-import app.repository.MessageRepository;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -20,21 +16,16 @@ import org.springframework.validation.annotation.Validated;
 public class ChatWsService {
     private static final Logger LOGGER = LoggerFactory.getLogger(ChatWsService.class);
     private final SimpMessagingTemplate simpMessagingTemplate;
-    private final MessageRepository messageRepository;
-    private final MessageMapper messageMapper;
     private final UserSessionRegistry userSessionRegistry;
 
-    public void messageCreated(@Valid MessageCreatedEvent e) {
-        Message message = messageRepository.findById(e.messageDTO().id()).orElseThrow();
-        MessageDTO messageDTO = messageMapper.toDTO(message);
+    public void sendMessageToUsers(@Valid MessageCreatedEvent e) {
+        MessageDTO messageDTO = e.messageDTO();
 
         LOGGER.info("WS publish messageId={}, chatId={}, memberships={}",
-                messageDTO.id(), messageDTO.chatId(), message.getChat().getChatMemberships().size());
+                messageDTO.id(), messageDTO.chatId(), messageDTO.usernamesList().size());
 
-        message.getChat().getChatMemberships().stream()
-                .map(ChatMembership::getChatUser)
-                .forEach(chatUser -> {
-                    String username = chatUser.getUsername();
+        messageDTO.usernamesList()
+                .forEach(username -> {
                     LOGGER.info("WS sendToUser username={}", username);
 
                     // Standard Spring user destination (works across SockJS/raw WS sessions).

@@ -3,6 +3,7 @@ package dto.response;
 import jakarta.validation.constraints.NotNull;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
 public record MessageDTO(
@@ -10,6 +11,7 @@ public record MessageDTO(
         UUID responseToId,
         ChatUserDTO responseToSender,
         String responseToContent,
+        @NotNull List<String> usernamesList,
         @NotNull UUID chatId,
         @NotNull ChatUserDTO sender,
         @NotNull Instant created,

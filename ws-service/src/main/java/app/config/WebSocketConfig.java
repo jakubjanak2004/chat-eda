@@ -1,7 +1,7 @@
-package app.config.ws;
+package app.config;
 
 import app.config.props.WebSocketProperties;
-import app.service.ws.UserSessionRegistry;
+import app.service.UserSessionRegistry;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.ChannelRegistration;

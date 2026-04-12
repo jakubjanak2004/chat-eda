@@ -1,5 +1,6 @@
 package app.mapper;
 
+import app.entity.ChatMembership;
 import dto.event.MessageCreatedEvent;
 import dto.response.MessageDTO;
 import app.entity.Chat;
@@ -8,9 +9,11 @@ import app.entity.ChatUser;
 import app.entity.Message;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.Named;
 import org.mapstruct.ReportingPolicy;
 
 import java.time.Instant;
+import java.util.List;
 
 @Mapper(
         componentModel = "spring",
@@ -22,7 +25,16 @@ public interface MessageMapper {
     @Mapping(source = "responseTo.content", target = "responseToContent")
     @Mapping(source = "chatUser", target = "sender")
     @Mapping(source = "message.chat.id", target = "chatId")
+    @Mapping(source = "chat", target = "usernamesList", qualifiedByName = "toUsernamesList")
     MessageDTO toDTO(Message message);
+
+    @Named("toUsernamesList")
+    default List<String> toUsernamesList(Chat chat) {
+        return chat.getChatMemberships().stream()
+                .map(ChatMembership::getChatUser)
+                .map(ChatUser::getUsername)
+                .toList();
+    }
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "responseTo", ignore = true)

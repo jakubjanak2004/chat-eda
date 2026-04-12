@@ -7,6 +7,7 @@ COPY search-service/mvnw search-service/mvnw
 COPY pom.xml pom.xml
 COPY shared/pom.xml shared/pom.xml
 COPY user-service/pom.xml user-service/pom.xml
+COPY ws-service/pom.xml ws-service/pom.xml
 COPY search-service/pom.xml search-service/pom.xml
 
 RUN chmod +x search-service/mvnw

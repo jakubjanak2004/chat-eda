@@ -1,4 +1,4 @@
-package app.service.ws;
+package app.service;
 
 import org.springframework.stereotype.Component;
 

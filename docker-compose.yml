@@ -1,6 +1,4 @@
 services:
-  # Single HTTP entrypoint for apps: user-service and search-service are not published on the host.
-  # Gateway: prefixed /user/..., /search/...; legacy GET /users, GET /chats/me, GET /chats/{uuid}/messages -> search-service; else user-service (see gateway/nginx.conf).
   gateway:
     image: nginx:1.27-alpine
     container_name: chat-eda-gateway
@@ -11,6 +9,7 @@ services:
     depends_on:
       - user-service
       - search-service
+      - ws-service
 
   user-service:
     build:
@@ -20,7 +19,6 @@ services:
     env_file:
       - .env
     environment:
-      # Inside Docker, Kafka is the compose service name — not localhost
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
     depends_on:
       postgres:
@@ -59,6 +57,27 @@ services:
       start_period: 30s
     volumes:
       - search_service_data:/tmp
+
+  ws-service:
+    build:
+      context: .
+      dockerfile: ws-service/Dockerfile
+    container_name: ws_service
+    env_file:
+      - .env
+    environment:
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+    depends_on:
+      kafka:
+        condition: service_started
+    healthcheck:
+      test: [ "CMD", "curl", "-fsS", "http://localhost:8080/ws/info" ]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 30s
+    volumes:
+      - ws_service_data:/tmp
 
   postgres:
     image: postgres:17-alpine
@@ -122,7 +141,8 @@ services:
 volumes:
   minio_data:
   postgres_data:
-  user_service_data:
-  search_service_data:
   kafka_data:
   elasticsearch_data_es9:
+  user_service_data:
+  search_service_data:
+  ws_service_data:
