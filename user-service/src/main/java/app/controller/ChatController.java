@@ -39,13 +39,6 @@ public class ChatController {
     private static final Logger LOGGER = LoggerFactory.getLogger(ChatController.class);
     private final ChatService chatService;
 
-    @GetMapping(value = "/me", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Page<ChatDTO>> getChatsForMe(@RequestParam(required = false) String query, Principal principal, @ParameterObject Pageable pageable) {
-        LOGGER.info("GET /chats/me?query={}&page={}&size={}&sort={}",
-                query, pageable.getPageNumber(), pageable.getPageSize(), pageable.getSort());
-        return ResponseEntity.ok(chatService.getChatsForUsername(query, principal.getName(), pageable));
-    }
-
     @PostMapping(value = "/me", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ChatDTO> createChat(@RequestBody CreateChatDTO createChatDTO, Principal principal) {
         LOGGER.info("POST /chats/me");
@@ -123,13 +116,6 @@ public class ChatController {
         LOGGER.info("DELETE /chats/{}/invitations/{}", chatId, username);
         chatService.deleteInvitationForChatWithUser(chatId, username);
         return ResponseEntity.ok().build();
-    }
-
-    @GetMapping(value = "/{chatId}/messages", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Page<MessageDTO>> getMessagesForChat(@PathVariable UUID chatId, @RequestParam(required = false) String query, @ParameterObject Pageable pageable) {
-        LOGGER.info("GET /chats/{}/messages?page={}&size={}&sort={}",
-                chatId, pageable.getPageNumber(), pageable.getPageSize(), pageable.getSort());
-        return ResponseEntity.ok(chatService.getMessagesForChat(query, chatId, pageable));
     }
 
     @GetMapping(value = "/{chatId}/messages/count", produces = MediaType.APPLICATION_JSON_VALUE)

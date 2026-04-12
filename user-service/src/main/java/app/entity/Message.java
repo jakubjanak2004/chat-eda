@@ -20,6 +20,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 @Entity
@@ -56,4 +57,10 @@ public class Message {
     @Column(nullable = false, columnDefinition = "TEXT")
     @Size(min = 1, max = ValidationConstraints.MESSAGE_CONTENT_MAX)
     private String content;
+
+    @Override
+    public String toString() {
+        String preview = Objects.toString(content);
+        return String.format("Message{id=%s, created=%s, content=%s}", id, created, preview);
+    }
 }

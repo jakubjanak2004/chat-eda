@@ -1,9 +1,11 @@
 package app.mapper;
 
 import app.entity.Message;
+import dto.response.ChatUserDTO;
 import dto.response.MessageDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.Named;
 import org.mapstruct.ReportingPolicy;
 
 @Mapper(
@@ -11,9 +13,15 @@ import org.mapstruct.ReportingPolicy;
         unmappedTargetPolicy = ReportingPolicy.ERROR
 )
 public interface MessageMapper {
-    @Mapping(target = "responseToSender", ignore = true)
-    @Mapping(target = "sender", ignore = true)
+    @Mapping(source = "responseToSenderUsername", target = "responseToSender", qualifiedByName = "usernameOnly")
+    @Mapping(source = "senderUsername", target = "sender", qualifiedByName = "usernameOnly")
     MessageDTO toDTO(Message message);
+
+    @Named("usernameOnly")
+    default ChatUserDTO usernameOnly(String username) {
+        if (username == null) return null;
+        return new ChatUserDTO(username, "", "", false);
+    }
 
     @Mapping(source = "responseToSender.username", target = "responseToSenderUsername")
     @Mapping(source = "sender.username", target = "senderUsername")
