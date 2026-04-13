@@ -71,7 +71,7 @@ services:
       kafka:
         condition: service_started
     healthcheck:
-      test: [ "CMD", "curl", "-fsS", "http://localhost:8080/ws/info" ]
+      test: [ "CMD", "curl", "-fsS", "http://localhost:9093/actuator/health" ]
       interval: 10s
       timeout: 3s
       retries: 5
