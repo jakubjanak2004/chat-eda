@@ -109,4 +109,8 @@ public class Generator {
                 .forEach(kafkaPublisher::publishMessageCreatedEvent);
         return savedMessages;
     }
+
+    public long getNumberOfUsers() {
+        return chatUserRepository.count();
+    }
 }

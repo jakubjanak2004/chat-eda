@@ -1,7 +1,6 @@
 services:
   gateway:
     image: nginx:1.27-alpine
-    container_name: chat-eda-gateway
     ports:
       - "8080:80"
     volumes:
@@ -12,76 +11,85 @@ services:
       - ws-service
 
   user-service:
+    image: chat-eda-user-service:latest
     build:
       context: .
       dockerfile: user-service/Dockerfile
-    container_name: user-service
     env_file:
       - .env
     environment:
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
     depends_on:
-      postgres:
-        condition: service_healthy
-      kafka:
-        condition: service_started
-    healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:9091/actuator/health" ]
-      interval: 10s
-      timeout: 3s
-      retries: 5
-      start_period: 30s
+      - postgres
+      - kafka
+#    healthcheck:
+#      test: [ "CMD", "curl", "-f", "http://localhost:8080/actuator/health" ]
+#      interval: 10s
+#      timeout: 3s
+#      retries: 5
+#      start_period: 30s
     volumes:
       - user_service_data:/tmp
+    networks:
+      default:
+        aliases:
+          - user-service
 
   search-service:
+    image: chat-eda-search-service:latest
     build:
       context: .
       dockerfile: search-service/Dockerfile
-    container_name: search-service
     env_file:
       - .env
     environment:
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       SPRING_ELASTICSEARCH_URIS: http://elasticsearch:9200
     depends_on:
-      elasticsearch:
-        condition: service_healthy
-      kafka:
-        condition: service_started
-    healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:9093/actuator/health" ]
-      interval: 10s
-      timeout: 3s
-      retries: 5
-      start_period: 30s
+      - elasticsearch
+      - kafka
+#    healthcheck:
+#      test: [ "CMD", "curl", "-f", "http://localhost:8080/actuator/health" ]
+#      interval: 10s
+#      timeout: 3s
+#      retries: 5
+#      start_period: 30s
     volumes:
       - search_service_data:/tmp
+    networks:
+      default:
+        aliases:
+          - search-service
 
   ws-service:
+    image: chat-eda-ws-service:latest
+    deploy:
+      replicas: 3
     build:
       context: .
       dockerfile: ws-service/Dockerfile
-    container_name: ws_service
     env_file:
       - .env
     environment:
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      SPRING_KAFKA_CONSUMER_GROUP_ID: ws-service-$${HOSTNAME}
     depends_on:
-      kafka:
-        condition: service_started
-    healthcheck:
-      test: [ "CMD", "curl", "-fsS", "http://localhost:9093/actuator/health" ]
-      interval: 10s
-      timeout: 3s
-      retries: 5
-      start_period: 30s
+      - kafka
+#    healthcheck:
+#      test: [ "CMD", "curl", "-fsS", "http://localhost:8080/actuator/health" ]
+#      interval: 10s
+#      timeout: 3s
+#      retries: 5
+#      start_period: 30s
     volumes:
       - ws_service_data:/tmp
+    networks:
+      default:
+        aliases:
+          - ws-service
 
   postgres:
     image: postgres:17-alpine
-    container_name: chat-eda-postgres
     environment:
       POSTGRES_DB: chat_eda
       POSTGRES_USER: chat
@@ -98,7 +106,6 @@ services:
 
   kafka:
     image: confluentinc/cp-kafka:7.7.1
-    container_name: chat-eda-kafka
     ports:
       - "9092:9092"
     environment:
@@ -121,7 +128,6 @@ services:
   elasticsearch:
     # Must match elasticsearch-java on the classpath (Boot 4 → client 9.2.x). ES 8 + client 9 → indices.exists HTTP 400, no body.
     image: docker.elastic.co/elasticsearch/elasticsearch:9.2.6
-    container_name: chat-eda-elasticsearch
     environment:
       discovery.type: single-node
       xpack.security.enabled: "false"

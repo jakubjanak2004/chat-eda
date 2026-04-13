@@ -41,12 +41,17 @@ public class DatabaseInitializer implements CommandLineRunner {
 
     @Override
     public void run(@NotNull String... args) {
+        if (databaseNotEmpty()) return;
         LOGGER.info("Seeding database...");
         List<ChatUser> chatUsers = createSeedUsers();
         ChatUser firstChatUser = chatUsers.getFirst();
         createAdmin(firstChatUser);
         createTestUsers(usersSeedProperties.count(), usersSeedProperties.password(), usersSeedProperties.chatCount(), usersSeedProperties.messageCount());
         LOGGER.info("Seeding finished");
+    }
+
+    private boolean databaseNotEmpty() {
+        return generator.getNumberOfUsers() > 0;
     }
 
     private void createAdmin(ChatUser chatUser) {

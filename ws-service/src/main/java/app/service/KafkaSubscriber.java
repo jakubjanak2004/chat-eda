@@ -13,7 +13,7 @@ public class KafkaSubscriber {
     private static final Logger LOGGER = LoggerFactory.getLogger(KafkaSubscriber.class);
     private final ChatWsService chatWsService;
 
-    @KafkaListener(topics = "message-created", groupId = "ws-service")
+    @KafkaListener(topics = "message-created", groupId = "${app.kafka.ws-group-id}")
     public void listen(MessageCreatedEvent messageCreatedEvent) {
         LOGGER.info("Received messageCreatedEvent: {}", messageCreatedEvent);
         chatWsService.sendMessageToUsers(messageCreatedEvent);
