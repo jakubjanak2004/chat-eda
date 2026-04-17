@@ -3,7 +3,14 @@ set -euo pipefail
 
 cd /opt/chat-eda
 
-git pull
+# Refuse deployment from a dirty working tree (prevents pull conflicts).
+if ! git diff --quiet || ! git diff --cached --quiet; then
+  echo "Working tree is dirty. Commit/stash local changes first."
+  exit 1
+fi
+
+# Safer than a merge pull in automation.
+git pull --ff-only
 
 : "${USER_SERVICE_IMAGE:?USER_SERVICE_IMAGE is not set}"
 : "${SEARCH_SERVICE_IMAGE:?SEARCH_SERVICE_IMAGE is not set}"
@@ -17,6 +24,14 @@ for i in {1..30}; do
     break
   fi
   sleep 2
+done
+
+# Extra guard: ensure old overlay network is really gone.
+for i in {1..30}; do
+  if ! docker network ls --format '{{.Name}}' | grep -q '^chat-eda_backend$'; then
+    break
+  fi
+  sleep 1
 done
 
 # Destructive cleanup: prune unused volumes on every Swarm node.
@@ -33,5 +48,14 @@ for host in "${NODE_HOSTS[@]}"; do
 done
 
 docker stack deploy --with-registry-auth -c stack.yml chat-eda
+
+# Wait until the new stack network appears before services converge.
+for i in {1..30}; do
+  if docker network ls --format '{{.Name}}' | grep -q '^chat-eda_backend$'; then
+    break
+  fi
+  sleep 1
+done
+
 docker service ls
 docker stack ps chat-eda
