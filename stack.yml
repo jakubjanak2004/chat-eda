@@ -61,6 +61,7 @@ services:
       - ws_service_data:/tmp
     deploy:
       replicas: 3
+      endpoint_mode: dnsrr
       restart_policy:
         condition: on-failure
     networks:
