@@ -21,13 +21,8 @@ public class ChatWsService {
     public void sendMessageToUsers(@Valid MessageCreatedEvent e) {
         MessageDTO messageDTO = e.messageDTO();
 
-        LOGGER.info("WS publish messageId={}, chatId={}, memberships={}",
-                messageDTO.id(), messageDTO.chatId(), messageDTO.usernamesList().size());
-
         messageDTO.usernamesList()
                 .forEach(username -> {
-                    LOGGER.info("WS sendToUser username={}", username);
-
                     // Standard Spring user destination (works across SockJS/raw WS sessions).
                     simpMessagingTemplate.convertAndSendToUser(username, "/queue/messages", messageDTO);
 

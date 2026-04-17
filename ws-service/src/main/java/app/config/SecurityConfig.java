@@ -47,6 +47,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         // no authentication for websocket endpoint
                         .requestMatchers("/ws/**").permitAll()
+                        // no authentication for raw websocket endpoint
+                        .requestMatchers("/ws-raw/**").permitAll()
                         // no authentication required for auth endpoint
                         .requestMatchers("/auth/**").permitAll()
                         // allow Prometheus scrape and basic health without auth

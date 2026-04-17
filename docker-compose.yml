@@ -64,7 +64,7 @@ services:
   ws-service:
     image: chat-eda-ws-service:latest
     deploy:
-      replicas: 3
+      replicas: 3 # todo will be 3
     build:
       context: .
       dockerfile: ws-service/Dockerfile
@@ -75,6 +75,8 @@ services:
       SPRING_KAFKA_CONSUMER_GROUP_ID: ws-service-$${HOSTNAME}
     depends_on:
       - kafka
+#    ports:
+#      - "8082:8080"
 #    healthcheck:
 #      test: [ "CMD", "curl", "-fsS", "http://localhost:8080/actuator/health" ]
 #      interval: 10s

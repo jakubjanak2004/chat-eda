@@ -15,7 +15,6 @@ public class KafkaSubscriber {
 
     @KafkaListener(topics = "message-created", groupId = "${app.kafka.ws-group-id}")
     public void listen(MessageCreatedEvent messageCreatedEvent) {
-        LOGGER.info("Received messageCreatedEvent: {}", messageCreatedEvent);
         chatWsService.sendMessageToUsers(messageCreatedEvent);
     }
 }
