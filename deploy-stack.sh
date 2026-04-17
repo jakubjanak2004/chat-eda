@@ -20,6 +20,14 @@ docker stack rm chat-eda
 
 sleep 5
 
+# Remove volumes for each node
+for n in $(docker node ls --format '{{.Hostname}}'); do
+  echo "== $n =="
+  ssh "root@$n" 'docker volume ls -q | rg "^chat-eda_" | xargs -r docker volume rm'
+done
+
+sleep 5
+
 docker stack deploy --with-registry-auth -c stack.yml chat-eda
 
 docker service ls
