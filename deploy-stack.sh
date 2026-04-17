@@ -19,6 +19,19 @@ for i in {1..30}; do
   sleep 2
 done
 
+# Destructive cleanup: prune unused volumes on every Swarm node.
+echo "Pruning volumes on all swarm nodes..."
+mapfile -t NODE_HOSTS < <(docker node ls --format '{{.Hostname}}')
+
+for host in "${NODE_HOSTS[@]}"; do
+  echo "Pruning volumes on ${host}..."
+  if [[ "${host}" == "$(hostname)" ]]; then
+    docker volume prune -f
+  else
+    ssh "root@${host}" "docker volume prune -f"
+  fi
+done
+
 docker stack deploy --with-registry-auth -c stack.yml chat-eda
 docker service ls
 docker stack ps chat-eda
