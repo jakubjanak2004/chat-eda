@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-cd /opt/chat-eda
-
 # Refuse deployment from a dirty working tree (prevents pull conflicts).
 if ! git diff --quiet || ! git diff --cached --quiet; then
   echo "Working tree is dirty. Commit/stash local changes first."
