@@ -160,6 +160,17 @@ services:
     networks:
       - backend
 
+  postgres-exporter:
+    image: prometheuscommunity/postgres-exporter:v0.15.0
+    environment:
+      DATA_SOURCE_NAME: "postgresql://chat:chat@postgres:5432/chat_eda?sslmode=disable"
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    networks:
+      - backend
+
 networks:
   backend:
     driver: overlay

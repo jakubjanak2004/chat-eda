@@ -23,3 +23,9 @@ scrape_configs:
       - names: ["tasks.chat-eda_ws-service"]
         type: A
         port: 8081
+
+  - job_name: postgres-exporter
+    dns_sd_configs:
+      - names: [ "tasks.chat-eda_postgres-exporter" ]
+        type: A
+        port: 9187
