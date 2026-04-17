@@ -141,6 +141,25 @@ services:
     networks:
       - backend
 
+  prometheus:
+    image: prom/prometheus:v2.54.1
+    ports:
+      - "9090:9090"
+    volumes:
+      - prometheus_data:/prometheus
+    configs:
+      - source: prometheus_yml
+        target: /etc/prometheus/prometheus.yml
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    networks:
+      - backend
+
 networks:
   backend:
     driver: overlay
@@ -148,6 +167,8 @@ networks:
 configs:
   gateway_nginx_conf:
     file: ./gateway/nginx.conf
+  prometheus_yml:
+    file: ./observability/prometheus.yml
 
 volumes:
   postgres_data:
@@ -156,3 +177,4 @@ volumes:
   user_service_data:
   search_service_data:
   ws_service_data:
+  prometheus_data:
