@@ -1,0 +1,1 @@
+docker volume ls -q | xargs -r docker volume rm
