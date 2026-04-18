@@ -146,6 +146,18 @@ services:
       # New name: old volume had ES 8.15 node metadata; ES 9 cannot jump 8.15→9 without 8.19 first (dev: fresh volume is simplest).
       - elasticsearch_data_es9:/usr/share/elasticsearch/data
 
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:v0.49.1
+    privileged: true
+    ports:
+      - "8085:8080"
+    volumes:
+      - /:/rootfs:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /sys:/sys:ro
+      - /var/lib/docker:/var/lib/docker:ro
+      - /dev/disk/:/dev/disk:ro
+
 volumes:
   minio_data:
   postgres_data:
