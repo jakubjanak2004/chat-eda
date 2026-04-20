@@ -61,38 +61,15 @@ public class ChatService {
     private final InvitationMapper invitationMapper;
     private final KafkaPublisher kafkaPublisher;
 
-    @PreAuthorize("@chatUserSecurity.hasUsername(#username, authentication)")
-    public Page<ChatDTO> getChatsForUsername(String query, String username, Pageable pageable) {
-        String queryNormalized = TextNormalize.normalize(query);
-        return chatRepository.findChatsForUsername(username, queryNormalized, pageable)
-                .map(this::fromChatToDTO);
-    }
-
     @PreAuthorize("@chatSecurity.canManageChatWithId(#chatId, authentication)")
-    public Page<MessageDTO> getMessagesForChat(String query, UUID chatId, Pageable pageable) {
-        String queryNormalized = TextNormalize.normalize(query);
-        return messageRepository.findMessages(chatId, queryNormalized, pageable)
-                .map(messageMapper::toDTO);
-    }
-
-    @PreAuthorize("@chatSecurity.canManageChatWithId(#chatId, authentication)")
-    public MessageDTO createMessageForChat(UUID chatId, @Valid CreateMessageDTO messageDTO, String username) {
-        ChatUser chatUser = chatUserRepository.findByUsername(username).orElseThrow();
-
+    public MessageDTO createMessageForChat(UUID chatId, @Valid CreateMessageDTO createMessageDTO, String username) {
         Chat chat = chatRepository.findById(chatId).orElseThrow();
-
-        Message message = messageMapper.toEntity(messageDTO, chat, chatUser, Instant.now());
-
-        if (messageDTO.replyToId() != null) {
-            Message replyTo = messageRepository.findById(messageDTO.replyToId()).orElseThrow();
-            message.setResponseTo(replyTo);
-        }
-
-        Message saved = messageRepository.save(message);
-        MessageCreatedEvent messageCreatedEvent = messageMapper.toMessageCreatedEvent(saved);
+        ChatUser chatUser = chatUserRepository.findByUsername(username).orElseThrow();
+        MessageDTO messageDTO = messageMapper.toDTO(createMessageDTO, chat, chatUser, Instant.now());
+        MessageCreatedEvent messageCreatedEvent = messageMapper.toMessageCreatedEvent(messageDTO);
         kafkaPublisher.publishMessageCreatedEvent(messageCreatedEvent);
 
-        return messageMapper.toDTO(saved);
+        return messageCreatedEvent.messageDTO();
     }
 
     @PreAuthorize("@chatUserSecurity.hasUsername(#ownerUsername, authentication)")

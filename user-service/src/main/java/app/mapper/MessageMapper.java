@@ -1,12 +1,12 @@
 package app.mapper;
 
-import app.entity.ChatMembership;
-import dto.event.MessageCreatedEvent;
-import dto.response.MessageDTO;
 import app.entity.Chat;
-import dto.request.CreateMessageDTO;
+import app.entity.ChatMembership;
 import app.entity.ChatUser;
 import app.entity.Message;
+import dto.event.MessageCreatedEvent;
+import dto.request.CreateMessageDTO;
+import dto.response.MessageDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
@@ -41,6 +41,17 @@ public interface MessageMapper {
     @Mapping(target = "responses", ignore = true)
     Message toEntity(CreateMessageDTO createMessageDTO, Chat chat, ChatUser chatUser, Instant created);
 
-    @Mapping(source="message", target = "messageDTO")
+    @Mapping(source = "message", target = "messageDTO")
     MessageCreatedEvent toMessageCreatedEvent(Message message);
+
+    MessageCreatedEvent toMessageCreatedEvent(MessageDTO messageDTO);
+
+    @Mapping(target = "id", ignore = true)
+    @Mapping(source = "createMessageDTO.replyToId", target = "responseToId")
+    @Mapping(target = "responseToSender", ignore = true)
+    @Mapping(source = "chat.id", target = "chatId")
+    @Mapping(source = "chatUser", target = "sender")
+    @Mapping(target = "responseToContent", ignore = true)
+    @Mapping(target = "usernamesList", ignore = true)
+    MessageDTO toDTO(CreateMessageDTO createMessageDTO, Chat chat, ChatUser chatUser, Instant created);
 }

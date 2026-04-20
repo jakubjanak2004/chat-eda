@@ -29,6 +29,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @Getter
 @Setter
+// todo remove the message entity as it is being handled by search-service
 public class Message {
     @Id
     @GeneratedValue
