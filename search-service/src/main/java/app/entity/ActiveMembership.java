@@ -11,7 +11,7 @@ import java.util.UUID;
 
 @Getter
 @Setter
-@Document(indexName="activeMembership")
+@Document(indexName="active_membership")
 public class ActiveMembership {
     @Id
     private UUID id;
