@@ -1,6 +1,6 @@
 package app.service;
 
-import app.entity.Chat;
+import dto.event.ActiveMembershipCreatedEvent;
 import dto.event.ChatCreatedEvent;
 import dto.event.MessageCreatedEvent;
 import dto.event.UserCreatedEvent;
@@ -17,6 +17,7 @@ public class KafkaPublisher {
     private final KafkaTemplate<String, UserCreatedEvent> userCreatedEventKafkaTemplate;
     private final KafkaTemplate<String, MessageCreatedEvent> messageCreatedEventKafkaTemplate;
     private final KafkaTemplate<String, ChatCreatedEvent> chatCreatedEventKafkaTemplate;
+    private final KafkaTemplate<String, ActiveMembershipCreatedEvent> activeMembershipCreatedKafkaTemplate;
 
     public void publishUserCreatedEvent(@Valid UserCreatedEvent userCreatedEvent) {
         userCreatedEventKafkaTemplate.send("user-created", userCreatedEvent);
@@ -28,5 +29,9 @@ public class KafkaPublisher {
 
     public void publishChatCreatedEvent(@Valid ChatCreatedEvent chatCreatedEvent) {
         chatCreatedEventKafkaTemplate.send("chat-created", chatCreatedEvent);
+    }
+
+    public void publishActiveMembershipCreated(@Valid ActiveMembershipCreatedEvent activeMembershipCreated) {
+        activeMembershipCreatedKafkaTemplate.send("active-membership-created", activeMembershipCreated);
     }
 }

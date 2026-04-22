@@ -8,6 +8,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
@@ -21,6 +22,7 @@ public class MessageService {
     private final MessageRepository messageRepository;
     private final MessageMapper messageMapper;
 
+    @PreAuthorize("@chatSecurity.canManageChatWithId(#chatId, authentication)")
     public Page<MessageDTO> getMessagesForChat(String query, UUID chatId, Pageable pageable) {
         if (!StringUtils.hasText(query)) {
             return messageRepository.findByChatId(chatId, pageable)

@@ -1,5 +1,6 @@
 package app.mapper;
 
+import dto.event.ActiveMembershipCreatedEvent;
 import dto.response.ActiveMembershipDTO;
 import app.entity.ActiveMembership;
 import dto.request.ActiveMembershipUpdateDTO;
@@ -18,4 +19,6 @@ public interface ActiveMembershipMapper {
     @Mapping(target = "chatUser", ignore = true)
     @Mapping(target = "chat", ignore = true)
     void updateFromDTO(ActiveMembershipUpdateDTO activeMembershipUpdateDTO, @MappingTarget ActiveMembership activeMembership);
+
+    ActiveMembershipCreatedEvent toActiveMembershipCreatedEvent(ActiveMembership activeMembership);
 }

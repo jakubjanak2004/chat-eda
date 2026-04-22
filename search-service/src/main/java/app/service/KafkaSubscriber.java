@@ -1,5 +1,6 @@
 package app.service;
 
+import dto.event.ActiveMembershipCreatedEvent;
 import dto.event.ChatCreatedEvent;
 import dto.event.MessageCreatedEvent;
 import dto.event.UserCreatedEvent;
@@ -33,5 +34,11 @@ public class KafkaSubscriber {
     public void listen(ChatCreatedEvent chatCreatedEvent) {
         LOGGER.info("Received chatCreatedEvent: {}", chatCreatedEvent);
         chatService.createChat(chatCreatedEvent.chatDTO());
+    }
+
+    @KafkaListener(topics = "active-membership-created", groupId = "search-service")
+    public void listen(ActiveMembershipCreatedEvent activeMembershipCreatedEvent) {
+        LOGGER.info("Received activeMembershipCreatedEvent: {}", activeMembershipCreatedEvent);
+        chatService.createActiveMembership(activeMembershipCreatedEvent.chatId(), activeMembershipCreatedEvent.username());
     }
 }

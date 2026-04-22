@@ -1,9 +1,11 @@
 package app.util;
 
+import app.entity.ActiveMembership;
 import app.entity.Chat;
 import app.entity.ChatMembership;
 import app.entity.ChatUser;
 import app.entity.Message;
+import app.mapper.ActiveMembershipMapper;
 import app.mapper.ChatMapper;
 import app.mapper.ChatUserMapper;
 import app.mapper.MessageMapper;
@@ -36,6 +38,7 @@ public class Generator {
     private final MessageMapper messageMapper;
     private final ChatUserMapper chatUserMapper;
     private final ChatMapper chatMapper;
+    private final ActiveMembershipMapper activeMembershipMapper;
 
     public List<ChatUser> generateChatUsers(int count, ParallelEntitySeedFactory<ChatUser> parallelEntitySeedFactory) {
         List<ChatUser> chatUserList = parallelEntitySeedFactory.createEntities(count);
@@ -97,6 +100,12 @@ public class Generator {
         savedChats.stream()
                 .map(chatMapper::toChatCreatedEvent)
                 .forEach(kafkaPublisher::publishChatCreatedEvent);
+        savedChats.stream()
+                .flatMap(chat -> chat.getChatMemberships().stream())
+                .filter(membership -> membership instanceof ActiveMembership)
+                .map(membership -> (ActiveMembership) membership)
+                .map(activeMembershipMapper::toActiveMembershipCreatedEvent)
+                .forEach(kafkaPublisher::publishActiveMembershipCreated);
         return savedChats;
     }
 
