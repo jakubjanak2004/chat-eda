@@ -20,5 +20,7 @@ public interface ActiveMembershipMapper {
     @Mapping(target = "chat", ignore = true)
     void updateFromDTO(ActiveMembershipUpdateDTO activeMembershipUpdateDTO, @MappingTarget ActiveMembership activeMembership);
 
+    @Mapping(source = "chat.id", target = "chatId")
+    @Mapping(source = "chatUser.username", target = "username")
     ActiveMembershipCreatedEvent toActiveMembershipCreatedEvent(ActiveMembership activeMembership);
 }

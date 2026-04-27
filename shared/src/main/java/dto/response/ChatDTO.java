@@ -11,7 +11,6 @@ public record ChatDTO(
         @NotNull
         String name,
         @NotNull
-        List<ChatUserDTO> chatUsers,
-        MessageDTO lastMessage
+        List<ChatUserDTO> chatUsers
 ) {
 }

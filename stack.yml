@@ -13,7 +13,7 @@ services:
       restart_policy:
         condition: on-failure
     networks:
-      - backend
+      - backend_eda
 
   user-service:
     image: ${USER_SERVICE_IMAGE}
@@ -28,7 +28,7 @@ services:
       restart_policy:
         condition: on-failure
     networks:
-      backend:
+      backend_eda:
         aliases:
           - user-service
 
@@ -46,7 +46,7 @@ services:
       restart_policy:
         condition: on-failure
     networks:
-      backend:
+      backend_eda:
         aliases:
           - search-service
 
@@ -65,7 +65,7 @@ services:
       restart_policy:
         condition: on-failure
     networks:
-      backend:
+      backend_eda:
         aliases:
           - ws-service
 
@@ -89,7 +89,7 @@ services:
       restart_policy:
         condition: on-failure
     networks:
-      - backend
+      - backend_eda
 
   kafka:
     image: confluentinc/cp-kafka:7.7.1
@@ -116,7 +116,7 @@ services:
       restart_policy:
         condition: on-failure
     networks:
-      - backend
+      - backend_eda
 
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:9.2.6
@@ -139,7 +139,7 @@ services:
       restart_policy:
         condition: on-failure
     networks:
-      - backend
+      - backend_eda
 
   prometheus:
     image: prom/prometheus:v2.54.1
@@ -159,7 +159,7 @@ services:
       restart_policy:
         condition: on-failure
     networks:
-      - backend
+      - backend_eda
 
   postgres-exporter:
     image: prometheuscommunity/postgres-exporter:v0.15.0
@@ -170,7 +170,7 @@ services:
       restart_policy:
         condition: on-failure
     networks:
-      - backend
+      - backend_eda
 
   node-exporter:
     image: prom/node-exporter:v1.8.2
@@ -188,7 +188,7 @@ services:
       restart_policy:
         condition: on-failure
     networks:
-      - backend
+      - backend_eda
 
   cadvisor:
     image: gcr.io/cadvisor/cadvisor:v0.49.1
@@ -204,10 +204,10 @@ services:
       restart_policy:
         condition: on-failure
     networks:
-      - backend
+      - backend_eda
 
 networks:
-  backend:
+  backend_eda:
     driver: overlay
 
 configs:

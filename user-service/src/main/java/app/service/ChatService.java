@@ -133,7 +133,7 @@ public class ChatService {
         ChatCreatedEvent chatCreatedEvent = chatMapper.toChatCreatedEvent(saved);
         kafkaPublisher.publishChatCreatedEvent(chatCreatedEvent);
 
-        return chatMapper.toDTO(saved, null);
+        return chatMapper.toDTO(saved);
     }
 
     @PreAuthorize("@chatSecurity.canManageMessageWithId(#messageId, authentication)")
@@ -279,6 +279,6 @@ public class ChatService {
                 ).stream()
                 .findFirst()
                 .orElse(null);
-        return chatMapper.toDTO(chat, lastMessage);
+        return chatMapper.toDTO(chat);
     }
 }

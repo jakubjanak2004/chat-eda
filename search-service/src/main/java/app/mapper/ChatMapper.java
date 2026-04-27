@@ -20,10 +20,8 @@ import java.util.List;
 public interface ChatMapper {
 
     @Mapping(target = "chatUsers", ignore = true)
-    @Mapping(target = "lastMessage", ignore = true)
     ChatDTO toDTO(Chat chat);
 
-    @BeanMapping(ignoreUnmappedSourceProperties = "lastMessage")
     @Mapping(target = "nameNormalized", source = "name", qualifiedByName = "normalizeChatName")
     @Mapping(target = "usernamesList", source = "chatUsers", qualifiedByName = "chatUsernames")
     Chat toEntity(ChatDTO chatDTO);
