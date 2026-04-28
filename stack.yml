@@ -5,6 +5,10 @@ services:
     image: nginx:1.27-alpine
     ports:
       - "8080:80"
+    ulimits:
+      nofile:
+        soft: 200000
+        hard: 200000
     configs:
       - source: gateway_nginx_conf
         target: /etc/nginx/nginx.conf
