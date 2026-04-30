@@ -16,7 +16,7 @@ fi
 : "${SEARCH_SERVICE_IMAGE:?SEARCH_SERVICE_IMAGE is not set}"
 : "${WS_SERVICE_IMAGE:?WS_SERVICE_IMAGE is not set}"
 
-docker stack rm chat-eda
+#docker stack rm chat-eda
 
 sleep 5
 
