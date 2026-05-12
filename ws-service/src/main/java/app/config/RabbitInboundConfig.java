@@ -1,5 +1,6 @@
 package app.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
@@ -11,9 +12,15 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class RabbitInboundConfig {
 
+    /**
+     * Spring AMQP's {@link Jackson2JsonMessageConverter} is built on FasterXML Jackson 2
+     * ({@code com.fasterxml.jackson.databind}). Spring Boot 4's default JSON stack is Jackson 3
+     * ({@code tools.jackson}), so we use a dedicated FasterXML {@link ObjectMapper} here.
+     */
     @Bean
     public Jackson2JsonMessageConverter rabbitJacksonMessageConverter() {
-        Jackson2JsonMessageConverter converter = new Jackson2JsonMessageConverter();
+        ObjectMapper mapper = new ObjectMapper();
+        Jackson2JsonMessageConverter converter = new Jackson2JsonMessageConverter(mapper);
         DefaultJackson2JavaTypeMapper typeMapper = new DefaultJackson2JavaTypeMapper();
         typeMapper.setTrustedPackages(
                 "dto.event",

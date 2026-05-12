@@ -24,6 +24,7 @@ public interface MessageMapper {
         return new ChatUserDTO(username, "", "", false);
     }
 
+    @Mapping(target = "id", ignore = true)
     @Mapping(source = "responseToSender.username", target = "responseToSenderUsername")
     @Mapping(source = "sender.username", target = "senderUsername")
     Message toEntity(MessageDTO messageDTO);

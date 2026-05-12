@@ -1,5 +1,6 @@
 package app.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import messaging.MessageCreatedAmqp;
 import org.springframework.amqp.core.DirectExchange;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
@@ -20,7 +21,8 @@ public class RabbitOutboundConfig {
 
     @Bean
     public Jackson2JsonMessageConverter rabbitJacksonMessageConverter() {
-        Jackson2JsonMessageConverter converter = new Jackson2JsonMessageConverter();
+        ObjectMapper mapper = new ObjectMapper();
+        Jackson2JsonMessageConverter converter = new Jackson2JsonMessageConverter(mapper);
         DefaultJackson2JavaTypeMapper typeMapper = new DefaultJackson2JavaTypeMapper();
         typeMapper.setTrustedPackages(
                 "dto.event",
