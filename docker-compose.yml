@@ -23,9 +23,11 @@ services:
       - .env
     environment:
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      SPRING_RABBITMQ_HOST: rabbitmq
     depends_on:
       - postgres
       - kafka
+      - rabbitmq
 #    healthcheck:
 #      test: [ "CMD", "curl", "-f", "http://localhost:8080/actuator/health" ]
 #      interval: 10s
@@ -75,10 +77,9 @@ services:
     env_file:
       - .env
     environment:
-      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
-      SPRING_KAFKA_CONSUMER_GROUP_ID: ws-service-$${HOSTNAME}
+      SPRING_RABBITMQ_HOST: rabbitmq
     depends_on:
-      - kafka
+      - rabbitmq
 #    ports:
 #      - "8082:8080"
 #    healthcheck:
@@ -131,6 +132,17 @@ services:
       CLUSTER_ID: "abcdefghijklmnopqrstuv"
     volumes:
       - kafka_data:/bitnami/kafka
+
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    hostname: rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    networks:
+      default:
+        aliases:
+          - rabbitmq
 
   elasticsearch:
     # Must match elasticsearch-java on the classpath (Boot 4 → client 9.2.x). ES 8 + client 9 → indices.exists HTTP 400, no body.
