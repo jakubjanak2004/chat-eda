@@ -24,10 +24,12 @@ services:
     environment:
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_DATA_REDIS_HOST: redis
     depends_on:
       - postgres
       - kafka
       - rabbitmq
+      - redis
 #    healthcheck:
 #      test: [ "CMD", "curl", "-f", "http://localhost:8080/actuator/health" ]
 #      interval: 10s
@@ -78,8 +80,10 @@ services:
       - .env
     environment:
       SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_DATA_REDIS_HOST: redis
     depends_on:
       - rabbitmq
+      - redis
 #    ports:
 #      - "8082:8080"
 #    healthcheck:
@@ -143,6 +147,14 @@ services:
       default:
         aliases:
           - rabbitmq
+
+  redis:
+    image: redis:7-alpine
+    hostname: redis
+    networks:
+      default:
+        aliases:
+          - redis
 
   elasticsearch:
     # Must match elasticsearch-java on the classpath (Boot 4 → client 9.2.x). ES 8 + client 9 → indices.exists HTTP 400, no body.

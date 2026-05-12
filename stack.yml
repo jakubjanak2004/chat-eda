@@ -34,6 +34,18 @@ services:
         aliases:
           - rabbitmq
 
+  redis:
+    image: redis:7-alpine
+    hostname: redis
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    networks:
+      backend_eda:
+        aliases:
+          - redis
+
   user-service:
     image: ${USER_SERVICE_IMAGE}
     env_file:
@@ -41,6 +53,7 @@ services:
     environment:
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_DATA_REDIS_HOST: redis
     volumes:
       - user_service_data:/tmp
     deploy:
@@ -76,6 +89,7 @@ services:
       - .env
     environment:
       SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_DATA_REDIS_HOST: redis
     volumes:
       - ws_service_data:/tmp
     # Published for A/B tests: hit ws directly (bypass gateway). Use STOMP on /ws-raw (allowedOriginPatterns "*").

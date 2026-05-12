@@ -1,13 +1,11 @@
 package app.config;
 
 import app.config.props.WebSocketProperties;
-import app.service.UserSessionRegistry;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
-import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
@@ -16,8 +14,7 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 @EnableWebSocketMessageBroker
 @RequiredArgsConstructor
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
-    private final JwtDecoder jwtDecoder;
-    private final UserSessionRegistry userSessionRegistry;
+    private final WSChannelInterceptor wsChannelInterceptor;
     private final WebSocketProperties webSocketProperties;
     @Value("${app.websocket.executor.inbound.core-pool-size:4}")
     private int inboundCorePoolSize;
@@ -34,7 +31,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void configureClientInboundChannel(ChannelRegistration registration) {
-        registration.interceptors(new WSChannelInterceptor(jwtDecoder, userSessionRegistry));
+        registration.interceptors(wsChannelInterceptor);
         registration.taskExecutor()
                 .corePoolSize(inboundCorePoolSize)
                 .maxPoolSize(inboundMaxPoolSize)
@@ -58,15 +55,11 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        // Raw WebSocket STOMP endpoint
         registry.addEndpoint("/ws-raw")
-                        .setAllowedOriginPatterns("*");
-//                .setAllowedOriginPatterns(webSocketProperties.allowedOrigins().toArray(String[]::new));
+                .setAllowedOriginPatterns("*");
 
-        // SockJS endpoint used by browser/app clients.
         registry.addEndpoint("/ws")
                 .setAllowedOriginPatterns(webSocketProperties.allowedOrigins().toArray(String[]::new))
                 .withSockJS();
     }
 }
-

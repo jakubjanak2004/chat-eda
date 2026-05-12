@@ -1,7 +1,7 @@
 package app.config;
 
 import messaging.MessageCreatedAmqp;
-import org.springframework.amqp.core.FanoutExchange;
+import org.springframework.amqp.core.DirectExchange;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -14,8 +14,8 @@ import org.springframework.context.annotation.Configuration;
 public class RabbitOutboundConfig {
 
     @Bean
-    public FanoutExchange messageCreatedFanoutExchange() {
-        return new FanoutExchange(MessageCreatedAmqp.FANOUT_EXCHANGE_MESSAGE_CREATED, true, false);
+    public DirectExchange wsMessageDirectExchange() {
+        return new DirectExchange(MessageCreatedAmqp.DIRECT_EXCHANGE_WS, true, false);
     }
 
     @Bean

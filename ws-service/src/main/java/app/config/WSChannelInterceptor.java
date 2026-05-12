@@ -3,8 +3,10 @@ package app.config;
 import app.service.UserSessionRegistry;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
+import messaging.WsUserPresenceKeys;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.simp.stomp.StompCommand;
@@ -14,15 +16,22 @@ import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.stereotype.Component;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
 
+@Component
 @RequiredArgsConstructor
 public class WSChannelInterceptor implements ChannelInterceptor {
     private static final Logger LOGGER = LoggerFactory.getLogger(WSChannelInterceptor.class);
+    private static final Duration PRESENCE_TTL = Duration.ofHours(24);
+
     private final JwtDecoder jwtDecoder;
     private final UserSessionRegistry userSessionRegistry;
+    private final StringRedisTemplate stringRedisTemplate;
+    private final WsInstanceIdentity wsInstanceIdentity;
 
     @Override
     public Message<?> preSend(@NotNull Message<?> message, @NotNull MessageChannel channel) {
@@ -44,7 +53,12 @@ public class WSChannelInterceptor implements ChannelInterceptor {
         String sessionId = accessor.getSessionId();
 
         userSessionRegistry.removeSession(sessionId).ifPresentOrElse(
-                username -> LOGGER.info("WS DISCONNECT username={} sessionId={}", username, sessionId),
+                username -> {
+                    if (userSessionRegistry.getSessionSet(username).isEmpty()) {
+                        stringRedisTemplate.delete(WsUserPresenceKeys.userToInstance(username));
+                    }
+                    LOGGER.info("WS DISCONNECT username={} sessionId={}", username, sessionId);
+                },
                 () -> LOGGER.info("WS DISCONNECT sessionId={} (username unknown)", sessionId)
         );
     }
@@ -67,7 +81,9 @@ public class WSChannelInterceptor implements ChannelInterceptor {
         Optional.ofNullable(accessor.getSessionId())
                 .ifPresent(sessionId -> {
                     userSessionRegistry.addSessionForUser(sessionId, username);
-                    LOGGER.info("WS CONNECT username={} sessionId={}", username, sessionId);
+                    stringRedisTemplate.opsForValue()
+                            .set(WsUserPresenceKeys.userToInstance(username), wsInstanceIdentity.routingKey(), PRESENCE_TTL);
+                    LOGGER.info("WS CONNECT username={} sessionId={} instance={}", username, sessionId, wsInstanceIdentity.routingKey());
                 });
     }
 }
