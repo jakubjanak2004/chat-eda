@@ -30,14 +30,11 @@ import dto.response.UserInvitationsDTO;
 import enumeration.MembershipType;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import utils.TextNormalize;
 
 import java.time.Instant;
 import java.util.List;
@@ -61,20 +58,6 @@ public class ChatService {
     private final InvitationMapper invitationMapper;
     private final KafkaPublisher kafkaPublisher;
 
-    @PreAuthorize("@chatUserSecurity.hasUsername(#username, authentication)")
-    public Page<ChatDTO> getChatsForUsername(String query, String username, Pageable pageable) {
-        String queryNormalized = TextNormalize.normalize(query);
-        return chatRepository.findChatsForUsername(username, queryNormalized, pageable)
-                .map(this::fromChatToDTO);
-    }
-
-    @PreAuthorize("@chatSecurity.canManageChatWithId(#chatId, authentication)")
-    public Page<MessageDTO> getMessagesForChat(String query, UUID chatId, Pageable pageable) {
-        String queryNormalized = TextNormalize.normalize(query);
-        return messageRepository.findMessages(chatId, queryNormalized, pageable)
-                .map(messageMapper::toDTO);
-    }
-
     @PreAuthorize("@chatSecurity.canManageChatWithId(#chatId, authentication)")
     public MessageDTO createMessageForChat(UUID chatId, @Valid CreateMessageDTO messageDTO, String username) {
         ChatUser chatUser = chatUserRepository.findByUsername(username).orElseThrow();
@@ -88,11 +71,12 @@ public class ChatService {
             message.setResponseTo(replyTo);
         }
 
-        Message saved = messageRepository.save(message);
-        MessageCreatedEvent messageCreatedEvent = messageMapper.toMessageCreatedEvent(saved);
+        // not saving the entity here, as will be saved in Messaging service
+//        Message saved = messageRepository.save(message);
+        MessageCreatedEvent messageCreatedEvent = messageMapper.toMessageCreatedEvent(message);
         kafkaPublisher.publishMessageCreatedEvent(messageCreatedEvent);
 
-        return messageMapper.toDTO(saved);
+        return messageMapper.toDTO(message);
     }
 
     @PreAuthorize("@chatUserSecurity.hasUsername(#ownerUsername, authentication)")

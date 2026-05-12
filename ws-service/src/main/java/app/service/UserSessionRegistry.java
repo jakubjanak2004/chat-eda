@@ -12,6 +12,10 @@ public class UserSessionRegistry {
     private final ConcurrentMap<String, Set<String>> usernameToSessionMap = new ConcurrentHashMap<>();
     private final ConcurrentMap<String, String> sessionIdToUsernameMap = new ConcurrentHashMap<>();
 
+    public boolean hasUsername(String username) {
+        return usernameToSessionMap.containsKey(username);
+    }
+
     public Set<String> getSessionSet(String username) {
         return usernameToSessionMap.computeIfAbsent(username, key -> ConcurrentHashMap.newKeySet());
     }

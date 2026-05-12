@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.UUID;
 
 public record MessageDTO(
-        @NotNull UUID id,
+//        @NotNull UUID id,
         UUID responseToId,
         ChatUserDTO responseToSender,
         String responseToContent,
