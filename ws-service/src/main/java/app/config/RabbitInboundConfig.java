@@ -1,6 +1,5 @@
 package app.config;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
@@ -13,8 +12,8 @@ import org.springframework.context.annotation.Configuration;
 public class RabbitInboundConfig {
 
     @Bean
-    public Jackson2JsonMessageConverter rabbitJacksonMessageConverter(ObjectMapper objectMapper) {
-        Jackson2JsonMessageConverter converter = new Jackson2JsonMessageConverter(objectMapper);
+    public Jackson2JsonMessageConverter rabbitJacksonMessageConverter() {
+        Jackson2JsonMessageConverter converter = new Jackson2JsonMessageConverter();
         DefaultJackson2JavaTypeMapper typeMapper = new DefaultJackson2JavaTypeMapper();
         typeMapper.setTrustedPackages(
                 "dto.event",
